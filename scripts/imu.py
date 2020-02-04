@@ -41,7 +41,7 @@ fmt_B, fmt_h = "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB", "<hhh"
 if __name__ == "__main__":
     rospy.init_node("imu")
 
-    port = rospy.get_param("~port", "/dev/imu")
+    port = rospy.get_param("~port", "/dev/ttyUSB0")
     imuHandle = serial.Serial(port=port, baudrate=115200, timeout=0.5)
     
     if imuHandle.isOpen():
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     imuPub = rospy.Publisher("imu", Imu, queue_size=10)
 
-    while True:
+    while not rospy.is_shutdown():
         data = imuHandle.read(size=65)
         stamp = rospy.get_rostime()
         result = re.search(feature, data)
@@ -77,7 +77,7 @@ if __name__ == "__main__":
                     af_l.append(af[i]/32768.0*16*-9.8), wf_l.append(wf[i]/32768.0*2000*math.pi/180), ef_l.append(ef[i]/32768.0*math.pi)
                 
                 
-                print math.degrees(ef_l[2])
+                #print math.degrees(ef_l[2])
 
                 imuMsg = Imu()
                 imuMsg.header.stamp, imuMsg.header.frame_id = stamp, "base_link"
@@ -91,4 +91,6 @@ if __name__ == "__main__":
                 imuPub.publish(imuMsg)
 
         time.sleep(0.01)
+
+    rospy.spin()
 

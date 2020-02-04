@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="wt61c" name="imu" type="imu.py">
+    <param name="port" value="/dev/ttyUSB0" />
+  </node>
+</launch>
